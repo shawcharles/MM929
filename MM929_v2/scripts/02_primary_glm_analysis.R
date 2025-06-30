@@ -255,39 +255,43 @@ cat("=====================\n\n")
 cat("4.1 Creating Delivery Type Trends and Forecasting Plot\n")
 cat("------------------------------------------------------\n")
 
+# Combine historical and forecast data for robust plotting
+plot_data <- delivery_analysis %>%
+  select(year, prop_vaginal) %>%
+  full_join(forecast_results, by = "year")
+
 # Create delivery trends plot with forecast
-p_delivery <- ggplot() +
-  # Historical data
-  geom_line(data = delivery_analysis, aes(x = year, y = prop_vaginal), 
-            linewidth = 1.2, color = "#2166ac") +
-  geom_point(data = delivery_analysis, aes(x = year, y = prop_vaginal), 
-             size = 3, color = "#2166ac") +
-  # Forecast data
-  geom_line(data = filter(forecast_results, is_forecast), 
-            aes(x = year, y = predicted_prop_vaginal), 
-            linewidth = 1.2, color = "#d73027", linetype = "dashed") +
-  geom_point(data = filter(forecast_results, is_forecast), 
-             aes(x = year, y = predicted_prop_vaginal), 
-             size = 3, color = "#d73027") +
-  # Confidence intervals for forecast
-  geom_ribbon(data = filter(forecast_results, is_forecast), 
-              aes(x = year, ymin = lower_ci, ymax = upper_ci), 
-              alpha = 0.3, fill = "#d73027") +
-  scale_y_continuous(labels = scales::percent_format(), limits = c(0.5, 0.8)) +
-  scale_x_continuous(breaks = seq(2017, 2030, 2)) +
+p_delivery <- ggplot(plot_data, aes(x = year)) +
+  # Fitted line for historical period (solid blue)
+  geom_line(data = . %>% filter(!is_forecast), aes(y = predicted_prop_vaginal), color = "#0571b0", linewidth = 1.2) +
+  
+  # Forecasted line (dashed red)
+  geom_line(data = . %>% filter(is_forecast), aes(y = predicted_prop_vaginal), color = "#ca0020", linetype = "dashed", linewidth = 1.2) +
+  
+  # Confidence interval ribbon for the forecast
+  geom_ribbon(data = . %>% filter(is_forecast), aes(ymin = lower_ci, ymax = upper_ci), fill = "#ca0020", alpha = 0.2) +
+
+  # Observed historical data points (drawn on top with outline for visibility)
+  geom_point(data = . %>% filter(!is_forecast), aes(y = prop_vaginal), color = "black", size = 3.5, shape = 21, fill = "#0571b0") +
+  
+  # Formatting and labels
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0.35, 0.75)) +
+  scale_x_continuous(breaks = seq(2017, 2030, by = 2)) +
   labs(
-    title = "Vaginal Delivery Trends and Forecast to 2030",
-    subtitle = "Historical data (2017-2024) and GLM-based forecast",
+    title = "Trend in Vaginal Delivery Proportion with Forecast to 2030",
+    subtitle = "Observed data (2017-2024) with GLM-based forecast and 95% confidence interval",
     x = "Year",
     y = "Proportion of Vaginal Deliveries",
-    caption = "Dashed line and shaded area represent forecast with 95% confidence interval"
+    caption = "Points are observed annual data. Lines represent the fitted model and forecast."
   ) +
-  theme_minimal() +
+  theme_minimal(base_size = 12) +
   theme(
-    plot.title = element_text(size = 14, face = "bold"),
-    plot.subtitle = element_text(size = 12),
-    axis.title = element_text(size = 11),
-    legend.position = "bottom"
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    plot.caption = element_text(face = "italic", size = 9),
+    axis.title = element_text(size = 12),
+    legend.position = "none",
+    panel.grid.minor = element_blank()
   )
 
 ggsave("delivery_trends_forecast.png", plot = p_delivery, path = plots_dir, 
