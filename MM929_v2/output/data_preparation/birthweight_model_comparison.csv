@@ -1,0 +1,5 @@
+model,formula,deviance,df_residual,dispersion,quasi_aic,n_parameters,deviance_per_df,delta_quasi_aic
+time_age_interaction,"cbind(small, appropriate + large) ~ time + simd_quintile * age_group",1201.7354926252808,398,3.0204614106036676,1243.7354926252808,21,3.019435911118796,0
+time_simd_interaction,"cbind(small, appropriate + large) ~ time * simd_quintile + age_group",1456.3855030615593,406,3.652562155332002,1482.3855030615593,13,3.5871564114816734,238.65001043627854
+full_interactions,"cbind(small, appropriate + large) ~ time * simd_quintile + time *      age_group",1452.8265954499934,403,3.670526123535791,1484.8265954499934,16,3.605028772828768,241.0911028247126
+main_effects,"cbind(small, appropriate + large) ~ time + simd_quintile + age_group",1517.5725611062205,410,3.764900290899183,1535.5725611062205,9,3.701396490502977,291.8370684809397
