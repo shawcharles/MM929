@@ -1,8 +1,0 @@
-Domain,Metric,Value,Interpretation
-Delivery Type,Analysis Period,2017-2024,Focus on recent trends post-2017.
-Delivery Type,Latest Observed Vaginal Delivery Rate (2024),56.7%,Represents a significant decrease since 2017.
-Delivery Type,Forecasted Vaginal Delivery Rate (2030),40.0% (95% CI: 38.5%-41.5%),Indicates a continuing sharp decline in vaginal deliveries.
-Birthweight Inequality,Analysis Period,1997-2022 (25 years),Long-term analysis of socioeconomic impact on birth outcomes.
-Birthweight Inequality,Primary Outcome,Small for Gestational Age (SGA),Key indicator of perinatal health.
-Birthweight Inequality,Inequality Metric (Most vs. Least Deprived),Rate Ratio (RR) by SIMD Quintile,Measures relative inequality between socioeconomic groups.
-Birthweight Inequality,Latest Rate Ratio (2022),1.82,Indicates births in the most deprived areas are 82% more likely to be SGA.
