@@ -345,7 +345,7 @@ p_inequality <- ggplot(inequality_analysis, aes(x = year, y = rate_ratio)) +
   geom_point(size = 3, color = "#d73027") +
   geom_ribbon(aes(ymin = rr_lower, ymax = rr_upper), alpha = 0.3, fill = "#d73027") +
   geom_hline(yintercept = 1, linetype = "dashed", color = "black") +
-  scale_y_continuous(breaks = seq(1, 3, 0.2)) +
+  scale_y_continuous(limits = c(1.7, 1.9), breaks = seq(1.7, 1.9, 0.05)) +
   labs(
     title = "Socioeconomic Inequality in Small for Gestational Age Births",
     subtitle = "Rate Ratio: Most Deprived (SIMD 1) vs Least Deprived (SIMD 5)",

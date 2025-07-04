@@ -41,15 +41,12 @@ delivery_analysis <- delivery_data_raw %>%
   filter(!is.na(delivery_group)) %>%
   # Aggregate from quarterly to yearly counts
   group_by(year, delivery_group) %>%
-  summarise(
-    births = sum(numerator, na.rm = TRUE),
-    total_births = first(denominator),
-    .groups = "drop"
-  ) %>%
-  # Recalculate proportion based on aggregated counts
-  mutate(proportion = births / total_births) %>%
+  summarise(births = sum(numerator, na.rm = TRUE), .groups = "drop_last") %>%
+  mutate(total_births = sum(births), proportion = births / total_births) %>%
+  ungroup() %>%
   # Pivot to wide format for analysis
   pivot_wider(
+    id_cols = c(year, total_births),
     names_from = delivery_group,
     values_from = c(births, proportion)
   ) %>%
@@ -151,23 +148,31 @@ delivery_summary <- delivery_analysis %>%
   summarise(
     years_covered = paste(min(year), "to", max(year)),
     total_years = n(),
-    mean_prop_vaginal = mean(prop_vaginal),
-    mean_prop_caesarean = mean(prop_caesarean),
-    trend_vaginal = cor(year, prop_vaginal),
-    trend_caesarean = cor(year, prop_caesarean)
+    mean_prop_vaginal = weighted.mean(prop_vaginal, total_births, na.rm = TRUE),
+    mean_prop_caesarean = weighted.mean(prop_caesarean, total_births, na.rm = TRUE),
+    trend_vaginal = cor(year, prop_vaginal, use = "complete.obs"),
+    trend_caesarean = cor(year, prop_caesarean, use = "complete.obs")
   )
 write_csv(delivery_summary, file.path(output_dir, "summary_delivery_overall.csv"))
 cat("-> Saved: summary_delivery_overall.csv\n")
 
 # Birthweight summary statistics
 birthweight_summary <- birthweight_analysis %>%
+  group_by(year) %>%
+  summarise(
+    yearly_total_births = sum(total_births, na.rm = TRUE),
+    yearly_prop_small = weighted.mean(prop_small, total_births, na.rm = TRUE),
+    yearly_prop_appropriate = weighted.mean(prop_appropriate, total_births, na.rm = TRUE),
+    yearly_prop_large = weighted.mean(prop_large, total_births, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
   summarise(
     years_covered = paste(min(year), "to", max(year)),
-    total_observations = n(),
-    total_births = sum(total_births),
-    mean_prop_small = weighted.mean(prop_small, total_births),
-    mean_prop_appropriate = weighted.mean(prop_appropriate, total_births),
-    mean_prop_large = weighted.mean(prop_large, total_births)
+    total_observations = nrow(birthweight_analysis),
+    total_births = sum(yearly_total_births, na.rm = TRUE),
+    mean_prop_small = weighted.mean(yearly_prop_small, yearly_total_births, na.rm = TRUE),
+    mean_prop_appropriate = weighted.mean(yearly_prop_appropriate, yearly_total_births, na.rm = TRUE),
+    mean_prop_large = weighted.mean(yearly_prop_large, yearly_total_births, na.rm = TRUE)
   )
 write_csv(birthweight_summary, file.path(output_dir, "summary_birthweight_overall.csv"))
 cat("-> Saved: summary_birthweight_overall.csv\n")

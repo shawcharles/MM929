@@ -1,5 +1,5 @@
 {
-  "analysis_date": ["2025-07-01 00:34:21"],
+  "analysis_date": ["2025-07-04 21:26:16"],
   "delivery_model": {
     "formula": ["cbind(vaginal_births, caesarean_births) ~ time + I(time^2)"],
     "dispersion": [3.716],
